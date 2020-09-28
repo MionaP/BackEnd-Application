@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+                   
+                   
+
+	<!-- Authentication manager -->
+	<security:authentication-manager id="authenticationManager">
+		<security:authentication-provider user-service-ref="userAccountDao">
+			<security:password-encoder ref="encoder" hash="bcrypt" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+		<!-- HTTP settings -->
+	<security:http 	realm="Protected API" 
+					use-expressions="true"
+					auto-config="false"
+					disable-url-rewriting="true" 
+					create-session="always" 
+					entry-point-ref="unauthorizedEntryPoint"
+					authentication-manager-ref="authenticationManager">
+					
+
+
+		<!-- Access Rights -->
+		<!-- ===================================================================================================================================== -->
+
+		<security:intercept-url  	pattern="/rest/testSecurity"						access="hasAnyRole('ROLE_USER')" />
+		<security:intercept-url  	pattern="/rest/links"								access="hasAnyRole('ROLE_USER')" />
+		<security:intercept-url  	pattern="/rest/links/**"							access="hasAnyRole('ROLE_USER')" />
+		<security:intercept-url  	pattern="/**" 										access="permitAll()" />
+		<!-- ===================================================================================================================================== -->
+
+		 
+		 <!-- Access denied handler -->
+		 <security:access-denied-handler ref="accessDeniedHandler" />
+		 
+		 <security:csrf disabled="true"/>
+
+
+	     <security:logout 	logout-success-url="/rest/success/logout"  	
+	     					logout-url="/rest/logout" 
+	         				delete-cookies="JSESSIONID" />
+	         				
+		</security:http>
+	
+  	 <!-- Security Beans -->
+	<bean id="unauthorizedEntryPoint" class="is.symphony.security.UnauthorizedEntryPoint" />
+	<bean id="accessDeniedHandler"  class="is.symphony.security.AccessDeniedExceptionHandler"/>
+	<bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<constructor-arg name="strength" value="11" />
+  	</bean>
+	
+</beans>

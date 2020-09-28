@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+         http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+	
+
+
+  	<!-- Session Factory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<map>
+	 			<entry key="hibernate.hbm2ddl.auto" value="update" />
+				<entry key="show_sql" value="true" />
+				<entry key="spring.h2.console.enabled" value="true"/>
+				<entry key="hibernate.transaction.coordinator_class" value="jdbc" />
+			</map>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>is.symphony.data.entities</value>
+			</list>
+		</property>
+	</bean>
+
+	<jdbc:embedded-database id="dataSource" type="H2">
+	</jdbc:embedded-database>
+
+	<!-- Transaction management -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+				
+		
+<!-- 	<bean id="multipartResolver" -->
+<!-- 	  class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> -->
+<!-- 	  <property name="maxUploadSize" value="300000000" /> -->
+<!-- 	</bean> -->
+	
+
+<!-- 	<bean id="loggerTaskExecutor" -->
+<!-- 		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"> -->
+<!-- 		<property name="corePoolSize" value="1" /> -->
+<!-- 		<property name="maxPoolSize" value="1" /> -->
+<!-- 	</bean> -->
+	
+	
+	<bean id="h2WebServer" class="org.h2.tools.Server" factory-method="createWebServer" init-method="start" destroy-method="stop">
+	    <constructor-arg value="-web,-webAllowOthers,-webPort,8082"/>
+	</bean>
+
+
+</beans>
